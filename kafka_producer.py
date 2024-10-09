@@ -2,9 +2,13 @@ from confluent_kafka import Producer
 import ujson
 import os
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
+print(os.getenv('KAFKA_BROKER_URL'))
 
 conf = {
-    'bootstrap.servers': 'localhost:9092'
+    'bootstrap.servers': os.getenv('KAFKA_BROKER_URL')
 }
 producer = Producer(**conf)
 topic = 'location_update'
