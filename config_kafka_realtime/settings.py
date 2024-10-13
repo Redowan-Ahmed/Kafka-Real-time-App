@@ -18,21 +18,31 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
+KAFKA_BROKER_URL = getenv('KAFKA_BROKER_URL')
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'delivery',
+    "corsheaders",
+
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+ASGI_APPLICATION = "config_kafka_realtime.asgi.application"
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -65,18 +75,18 @@ WSGI_APPLICATION = 'config_kafka_realtime.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": getenv('POSTGRES_DB'),
-        "USER": getenv('POSTGRES_USER'),
-        "PASSWORD": getenv('POSTGRES_PASSWORD'),
-        "HOST": getenv('POSTGRES_HOST'),
-        "PORT": getenv('POSTGRES_PORT'),
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
+    # "default": {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": getenv('POSTGRES_DB'),
+    #     "USER": getenv('POSTGRES_USER'),
+    #     "PASSWORD": getenv('POSTGRES_PASSWORD'),
+    #     "HOST": getenv('POSTGRES_HOST'),
+    #     "PORT": getenv('POSTGRES_PORT'),
+    # }
 }
 
 
@@ -124,3 +134,15 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_rabbitmq.core.RabbitmqChannelLayer",
+        "CONFIG": {
+            #        protocol://username:password@host:port - where the rabbitMq is running or listening /
+            "host": "amqp://redowan:123456@localhost:5672/",
+        },
+    },
+}

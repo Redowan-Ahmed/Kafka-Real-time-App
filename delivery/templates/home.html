@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Live Location</title>
+</head>
+
+<body>
+    Sending current location
+    <button id="send-location">Send Location</button>
+    <button id="stop">Stop</button>
+    <p id="log" ></p>
+
+    <script type="text/javascript">
+
+        let latitude =  0
+        let longitude = 0
+
+        async function sendLiveLocation(lat, lan) {
+            const url = location.origin
+            if(latitude != lat || longitude != lan ){
+                const response = await fetch(`${url}/location/?lat=${lat}&lon=${lan}`)
+                const data = await response.json()
+                console.log(data)
+                latitude = lat
+                longitude = lan
+            }
+            document.querySelector('#log').innerHTML = `Latitude: ${lat}, Longitude: ${lan}`
+        }
+        const send = document.querySelector('#send-location')
+        const stop = document.querySelector('#stop')
+
+        let interval
+
+        send.addEventListener('click', (e) => {
+            navigator.geolocation.getCurrentPosition((position) => {
+                sendLiveLocation(position.coords.latitude, position.coords.longitude)
+            });
+            interval = setInterval(() => {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    sendLiveLocation(position.coords.latitude, position.coords.longitude)
+                });
+            }, 3000)
+        })
+        stop.addEventListener('click', (e) => {
+            navigator.geolocation.getCurrentPosition((position) => {
+                sendLiveLocation(position.coords.latitude, position.coords.longitude)
+            });
+            clearInterval(interval)
+        })
+
+    </script>
+</body>
+
+</html>
